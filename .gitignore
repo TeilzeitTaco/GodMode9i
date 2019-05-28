@@ -1,0 +1,9 @@
+# Ignore binary files
+
+build/
+*.cia
+*.o
+*.nds
+*.bin
+*.elf
+*.d

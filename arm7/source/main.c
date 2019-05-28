@@ -64,7 +64,7 @@ void powerButtonCB() {
 int main() {
 //---------------------------------------------------------------------------------
     nocashMessage("ARM7 main.c main");
-	
+
 	// clear sound registers
 	dmaFillWords(0, (void*)0x04000400, 0x100);
 
@@ -82,9 +82,9 @@ int main() {
 	touchInit();
 
 	fifoInit();
-	
+
 	SetYtrigger(80);
-	
+
 	installSystemFIFO();
 
 	irqSet(IRQ_VCOUNT, VcountHandler);
@@ -93,7 +93,7 @@ int main() {
 	irqEnable( IRQ_VBLANK | IRQ_VCOUNT );
 
 	setPowerButtonCB(powerButtonCB);
-	
+
 	fifoSendValue32(FIFO_USER_03, *SCFG_EXT);
 	fifoSendValue32(FIFO_USER_07, *(u16*)(0x4004700));
 	fifoSendValue32(FIFO_USER_06, 1);
@@ -108,4 +108,3 @@ int main() {
 	}
 	return 0;
 }
-

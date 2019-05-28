@@ -78,7 +78,8 @@ extern unsigned long dsiMode;
 
 #define FW_READ        0x03
 
-void boot_readFirmware (uint32 address, uint8 * buffer, uint32 size) {
+void boot_readFirmware(uint32 address, uint8 * buffer, uint32 size)
+{
   uint32 index;
 
   // Read command
@@ -104,21 +105,22 @@ void boot_readFirmware (uint32 address, uint8 * buffer, uint32 size) {
 }
 
 
-static inline void copyLoop (u32* dest, const u32* src, u32 size) {
+static inline void copyLoop(u32* dest, const u32* src, u32 size)
+{
 	size = (size +3) & ~3;
 	do {
 		*dest++ = *src++;
 	} while (size -= 4);
 }
 
-//#define resetCpu() __asm volatile("\tswi 0x000000\n");
 
 /*-------------------------------------------------------------------------
 passArgs_ARM7
 Copies the command line arguments to the end of the ARM9 binary,
 then sets a flag in memory for the loaded NDS to use
 --------------------------------------------------------------------------*/
-void passArgs_ARM7 (void) {
+void passArgs_ARM7(void)
+{
 	u32 ARM9_DST = *((u32*)(NDS_HEAD + 0x028));
 	u32 ARM9_LEN = *((u32*)(NDS_HEAD + 0x02C));
 	u32* argSrc;
@@ -126,7 +128,7 @@ void passArgs_ARM7 (void) {
 
 	if (!argStart || !argSize) return;
 
-	if ( ARM9_DST == 0 && ARM9_LEN == 0) {
+	if (ARM9_DST == 0 && ARM9_LEN == 0) {
 		ARM9_DST = *((u32*)(NDS_HEAD + 0x038));
 		ARM9_LEN = *((u32*)(NDS_HEAD + 0x03C));
 	}
@@ -155,8 +157,6 @@ void passArgs_ARM7 (void) {
 }
 
 
-
-
 /*-------------------------------------------------------------------------
 resetMemory_ARM7
 Clears all of the NDS's RAM that is visible to the ARM7
@@ -164,7 +164,7 @@ Written by Darkain.
 Modified by Chishm:
  * Added STMIA clear mem loop
 --------------------------------------------------------------------------*/
-void resetMemory_ARM7 (void)
+void resetMemory_ARM7(void)
 {
 	int i;
 	u8 settings1, settings2;
@@ -215,11 +215,10 @@ void resetMemory_ARM7 (void)
 	((vu32*)0x040044f0)[2] = 0x202DDD1D;
 	((vu32*)0x040044f0)[3] = 0xE1A00005;
 	while((*(vu32*)0x04004400) & 0x2000000);
-
 }
 
 
-void loadBinary_ARM7 (u32 fileCluster)
+void loadBinary_ARM7(u32 fileCluster)
 {
 	u32 ndsHeader[0x170>>2];
 
@@ -270,7 +269,8 @@ Written by Darkain.
 Modified by Chishm:
  * Removed MultiNDS specific stuff
 --------------------------------------------------------------------------*/
-void startBinary_ARM7 (void) {
+void startBinary_ARM7(void)
+{
 	REG_IME=0;
 	while(REG_VCOUNT!=191);
 	while(REG_VCOUNT==191);
@@ -285,11 +285,13 @@ void startBinary_ARM7 (void) {
 int sdmmc_sd_readsectors(u32 sector_no, u32 numsectors, void *out);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Main function
-bool sdmmc_inserted() {
+bool sdmmc_inserted()
+{
 	return true;
 }
 
-bool sdmmc_startup() {
+bool sdmmc_startup()
+{
 	sdmmc_controller_init(true);
 	return sdmmc_sdcard_init() == 0;
 }
@@ -301,11 +303,13 @@ bool sdmmc_readsectors(u32 sector_no, u32 numsectors, void *out) {
 void mpu_reset();
 void mpu_reset_end();
 
-int main (void) {
+int main(void)
+{
 #ifdef NO_DLDI
 	dsiSD = true;
 	dsiMode = true;
 #endif
+
 #ifndef NO_SDMMC
 	if (dsiSD && dsiMode) {
 		_io_dldi.fn_readSectors = sdmmc_readsectors;
@@ -313,6 +317,7 @@ int main (void) {
 		_io_dldi.fn_startup = sdmmc_startup;
 	}
 #endif
+
 	u32 fileCluster = storedFileCluster;
 	// Init card
 	if(!FAT_InitFiles(initDisc))
@@ -372,4 +377,3 @@ int main (void) {
 
 	return 0;
 }
-

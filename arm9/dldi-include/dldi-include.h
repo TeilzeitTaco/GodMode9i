@@ -20,4 +20,4 @@ extern unsigned char ak2_sd_dldi[];
 extern unsigned char dstwo_dldi[];
 //extern unsigned int dstwo_dldi_len;
 
-#endif //DLDIINCLUDE_H
+#endif // DLDIINCLUDE_H

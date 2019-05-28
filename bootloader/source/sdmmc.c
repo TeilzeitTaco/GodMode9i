@@ -239,4 +239,5 @@ int sdmmc_sdcard_readsectors(u32 sector_no, u32 numsectors, void *out) {
     sdmmc_send_command(&deviceSD,0x33C12,sector_no);
     return geterror(&deviceSD);
 }
-#endif
+
+#endif // NO_SDMMC

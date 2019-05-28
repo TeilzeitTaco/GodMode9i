@@ -14,10 +14,10 @@ u32 copyBuf[copyBufSize];
 
 char clipboard[256];
 char clipboardFilename[256];
-bool clipboardFolder = false;
-bool clipboardOn = false;
-bool clipboardUsed = false;
-bool clipboardDrive = false;	// false == SD card, true == Flashcard
+bool clipboardFolder  = false;
+bool clipboardOn      = false;
+bool clipboardUsed    = false;
+bool clipboardDrive   = false; // false == SD card, true == Flashcard
 bool clipboardInNitro = false;
 
 void printBytes(int bytes)
@@ -44,7 +44,7 @@ off_t getFileSize(const char *fileName)
     off_t fsize = 0;
     if (fp) {
         fseek(fp, 0, SEEK_END);
-        fsize = ftell(fp);			// Get source file's size
+        fsize = ftell(fp); // Get source file's size
 		fseek(fp, 0, SEEK_SET);
 	}
 	fclose(fp);
@@ -52,7 +52,8 @@ off_t getFileSize(const char *fileName)
 	return fsize;
 }
 
-void dirCopy(DirEntry* entry, int i, const char *destinationPath, const char *sourcePath) {
+void dirCopy(DirEntry* entry, int i, const char *destinationPath, const char *sourcePath)
+{
 	vector<DirEntry> dirContents;
 	dirContents.clear();
 	if (entry->isDirectory)	chdir((sourcePath + ("/" + entry->name)).c_str());
@@ -64,7 +65,7 @@ void dirCopy(DirEntry* entry, int i, const char *destinationPath, const char *so
 int fcopy(const char *sourcePath, const char *destinationPath)
 {
 	DIR *isDir = opendir (sourcePath);
-	
+
 	if (isDir != NULL) {
 		closedir(isDir);
 
@@ -73,7 +74,7 @@ int fcopy(const char *sourcePath, const char *destinationPath)
 		vector<DirEntry> dirContents;
 		getDirectoryContents(dirContents);
 		DirEntry* entry = &dirContents.at(1);
-		
+
 		mkdir(destinationPath, 0777);
 		for (int i = 1; i < ((int)dirContents.size()); i++) {
 			chdir(sourcePath);
@@ -92,7 +93,7 @@ int fcopy(const char *sourcePath, const char *destinationPath)
 	    off_t fsize = 0;
 	    if (sourceFile) {
 	        fseek(sourceFile, 0, SEEK_END);
-	        fsize = ftell(sourceFile);			// Get source file's size
+	        fsize = ftell(sourceFile); // Get source file's size
 			fseek(sourceFile, 0, SEEK_SET);
 		} else {
 			fclose(sourceFile);
@@ -100,13 +101,7 @@ int fcopy(const char *sourcePath, const char *destinationPath)
 		}
 
 	    FILE* destinationFile = fopen(destinationPath, "wb");
-		//if (destinationFile) {
-			fseek(destinationFile, 0, SEEK_SET);
-		/*} else {
-			fclose(sourceFile);
-			fclose(destinationFile);
-			return -1;
-		}*/
+		fseek(destinationFile, 0, SEEK_SET);
 
 		off_t offset = 0;
 		int numr;
@@ -141,7 +136,6 @@ int fcopy(const char *sourcePath, const char *destinationPath)
 				break;
 			}
 		}
-
 		return -1;
 	}
 }

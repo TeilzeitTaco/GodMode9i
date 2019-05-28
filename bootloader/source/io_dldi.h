@@ -1,10 +1,10 @@
 /*
- io_dldi.h 
+ io_dldi.h
 
  Reserved space for post-compilation adding of an extra driver
 
  Copyright (c) 2006 Michael "Chishm" Chisholm
-	
+
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
 
@@ -41,4 +41,4 @@
 // export interface
 extern IO_INTERFACE _io_dldi ;
 
-#endif	// define IO_DLDI_H
+#endif	// IO_DLDI_H

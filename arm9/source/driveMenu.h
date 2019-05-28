@@ -8,6 +8,4 @@ extern bool flashcardMountSkipped;
 
 extern void driveMenu (void);
 
-
-
-#endif //DRIVE_MENU_H
+#endif // DRIVE_MENU_H

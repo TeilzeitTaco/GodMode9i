@@ -37,6 +37,4 @@ struct DirEntry {
 std::string browseForFile (void);
 void getDirectoryContents (vector<DirEntry>& dirContents);
 
-
-
-#endif //FILE_BROWSE_H
+#endif // FILE_BROWSE_H

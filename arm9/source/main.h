@@ -19,5 +19,4 @@ extern bool is3DS;
 
 extern bool applaunch;
 
-
-#endif //MAIN_H
+#endif // MAIN_H

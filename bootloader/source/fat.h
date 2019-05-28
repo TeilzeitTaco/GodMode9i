@@ -1,13 +1,13 @@
 /*-----------------------------------------------------------------
  fat.h
- 
+
  NDS MP
  GBAMP NDS Firmware Hack Version 2.12
  An NDS aware firmware patch for the GBA Movie Player.
  By Michael Chisholm (Chishm)
- 
+
  Filesystem code based on GBAMP_CF.c by Chishm (me).
- 
+
 License:
  Copyright (C) 2005  Michael "Chishm" Chisholm
 

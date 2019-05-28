@@ -19,6 +19,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ------------------------------------------------------------------*/
+
 #include <nds.h>
 #include <stdio.h>
 #include <fat.h>
@@ -36,36 +37,24 @@
 
 #include "gm9i_logo.h"
 
+using namespace std;
+
 char titleName[32] = {" "};
+char filePath[PATH_MAX];
 
 int screenMode = 0;
 
-bool appInited = false;
-
+bool appInited      = false;
 bool arm7SCFGLocked = false;
-bool isRegularDS = true;
-bool is3DS = true;
-
-bool applaunch = false;
+bool isRegularDS    = true;
+bool is3DS          = true;
+bool applaunch      = false;
 
 static int bg3;
 
-using namespace std;
 
-//---------------------------------------------------------------------------------
-void stop (void) {
-//---------------------------------------------------------------------------------
-	while (1) {
-		swiWaitForVBlank();
-	}
-}
-
-char filePath[PATH_MAX];
-
-//---------------------------------------------------------------------------------
-int main(int argc, char **argv) {
-//---------------------------------------------------------------------------------
-
+int main(int argc, char **argv)
+{
 	// overwrite reboot stub identifier
 	extern u64 *fake_heap_end;
 	*fake_heap_end = 0;
@@ -74,15 +63,15 @@ int main(int argc, char **argv) {
 
 	int pathLen;
 	std::string filename;
-	
+
 	bool yHeld = false;
 
 	snprintf(titleName, sizeof(titleName), "GodMode9i v%i.%i.%i", 1, 3, 5);
 
-	// initialize video mode
+	// Initialize video mode
 	videoSetMode(MODE_4_2D);
 
-	// initialize VRAM banks
+	// Initialize VRAM banks
 	vramSetPrimaryBanks(VRAM_A_MAIN_BG,
 	                    VRAM_B_MAIN_SPRITE,
 	                    VRAM_C_LCD,
@@ -93,22 +82,21 @@ int main(int argc, char **argv) {
 	vramSetBankH(VRAM_H_SUB_BG);
 	consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 15, 0, false, true);
 
-	// Display GM9i logo
+	// Display GM9i logo on the top screen
 	bg3 = bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 1, 0);
 	bgSetScroll(bg3, 0, 0);
 	decompress(gm9i_logoBitmap, bgGetGfxPtr(bg3), LZ77Vram);
 
-	printf ("\x1b[1;1H");
+    // Bottom screen text
+	printf("\x1b[1;8H");
 	printf(titleName);
-	printf ("\x1b[2;1H");
-	printf ("------------------------------");
-	printf ("\x1b[3;1H");
-	printf ("https:/github.com/");
-	printf ("\x1b[4;11H");
-	printf ("RocketRobz/GodMode9i");
-	if (isDSiMode()) {
-		printf ("\x1b[22;1H");
-		printf ("Y Held - Disable cart access");
+	printf("\x1b[2;1H");
+	printf("------------------------------");
+	printf("\x1b[3;6H");
+	printf("Written by RocketRobz");
+	if(isDSiMode()) {
+		printf("\x1b[22;1H");
+		printf("Y Held - Disable cart access");
 	}
 
 	// Display for 2 seconds
@@ -117,31 +105,31 @@ int main(int argc, char **argv) {
 	}
 
 	fifoWaitValue32(FIFO_USER_06);
-	if (fifoGetValue32(FIFO_USER_03) == 0) arm7SCFGLocked = true;
+	if(fifoGetValue32(FIFO_USER_03) == 0) arm7SCFGLocked = true;
 	u16 arm7_SNDEXCNT = fifoGetValue32(FIFO_USER_07);
-	if (arm7_SNDEXCNT != 0) isRegularDS = false;	// If sound frequency setting is found, then the console is not a DS Phat/Lite
+	if(arm7_SNDEXCNT != 0) isRegularDS = false; // If sound frequency setting is found, then the console is not a DS Phat/Lite
 	fifoSendValue32(FIFO_USER_07, 0);
 
-	if (isDSiMode()) {
-		printf ("\x1b[22;1H");
-		printf ("                            ");	// Clear "Y Held" text
+	if(isDSiMode()) {
+		printf("\x1b[22;1H");
+		printf("                            ");	// Clear "Y Held" text
 	}
-	printf ("\x1b[22;11H");
-	printf ("mounting drive(s)...");
+	printf("\x1b[22;11H");
+	printf("mounting drive(s)...");
 
-	sysSetCartOwner (BUS_OWNER_ARM9);	// Allow arm9 to access GBA ROM
+	sysSetCartOwner(BUS_OWNER_ARM9); // Allow arm9 to access GBA ROM
 
-	if (isDSiMode()) {
+	if(isDSiMode()) {
 		scanKeys();
-		if (keysHeld() & KEY_Y) {
+		if(keysHeld() & KEY_Y) {
 			yHeld = true;
 		}
 		sdMounted = sdMount();
 	}
-	if (!isDSiMode() || !sdMounted || (access("sd:/Nintendo 3DS", F_OK) != 0)) {
+	if(!isDSiMode() || !sdMounted || (access("sd:/Nintendo 3DS", F_OK) != 0)) {
 		is3DS = false;
 	}
-	if (!isDSiMode() || !yHeld) {
+	if(!isDSiMode() || !yHeld) {
 		flashcardMounted = flashcardMount();
 		flashcardMountSkipped = false;
 	}
@@ -155,37 +143,36 @@ int main(int argc, char **argv) {
 	appInited = true;
 
 	while(1) {
-
-		if (screenMode == 0) {
+		if(screenMode == 0) {
 			driveMenu();
 		} else {
 			filename = browseForFile();
 		}
 
-		if (applaunch) {
+		if(applaunch) {
 			// Construct a command line
-			getcwd (filePath, PATH_MAX);
+			getcwd(filePath, PATH_MAX);
 			pathLen = strlen (filePath);
 			vector<char*> argarray;
 
-			if ((strcasecmp (filename.c_str() + filename.size() - 5, ".argv") == 0)
+			if((strcasecmp (filename.c_str() + filename.size() - 5, ".argv") == 0)
 			|| (strcasecmp (filename.c_str() + filename.size() - 5, ".ARGV") == 0)) {
 
 				FILE *argfile = fopen(filename.c_str(),"rb");
 				char str[PATH_MAX], *pstr;
 				const char seps[]= "\n\r\t ";
 
-				while( fgets(str, PATH_MAX, argfile) ) {
+				while(fgets(str, PATH_MAX, argfile)) {
 					// Find comment and end string there
-					if( (pstr = strchr(str, '#')) )
-						*pstr= '\0';
+					if((pstr = strchr(str, '#')))
+						*pstr = '\0';
 
 					// Tokenize arguments
-					pstr= strtok(str, seps);
+					pstr = strtok(str, seps);
 
-					while( pstr != NULL ) {
+					while(pstr != NULL) {
 						argarray.push_back(strdup(pstr));
-						pstr= strtok(NULL, seps);
+						pstr = strtok(NULL, seps);
 					}
 				}
 				fclose(argfile);
@@ -193,37 +180,39 @@ int main(int argc, char **argv) {
 			} else {
 				argarray.push_back(strdup(filename.c_str()));
 			}
-			if ((strcasecmp (filename.c_str() + filename.size() - 4, ".dsi") == 0)
+
+			if((strcasecmp (filename.c_str() + filename.size() - 4, ".dsi") == 0)
 			|| (strcasecmp (filename.c_str() + filename.size() - 4, ".DSI") == 0)) {
 				char *name = argarray.at(0);
 				strcpy (filePath + pathLen, name);
 				free(argarray.at(0));
 				argarray.at(0) = filePath;
 				consoleClear();
-				iprintf ("Running %s with %d parameters\n", argarray[0], argarray.size());
+				iprintf("Running %s with %d parameters\n", argarray[0], argarray.size());
 				int err = runNdsFile (argarray[0], argarray.size(), (const char **)&argarray[0]);
-				iprintf ("\x1b[31mStart failed. Error %i\n", err);
+				iprintf("\x1b[31mStart failed. Error %i\n", err);
 			}
-			if ((strcasecmp (filename.c_str() + filename.size() - 4, ".nds") == 0)
+
+			if((strcasecmp (filename.c_str() + filename.size() - 4, ".nds") == 0)
 			|| (strcasecmp (filename.c_str() + filename.size() - 4, ".NDS") == 0)) {
 				char *name = argarray.at(0);
 				strcpy (filePath + pathLen, name);
 				free(argarray.at(0));
 				argarray.at(0) = filePath;
 				consoleClear();
-				iprintf ("Running %s with %d parameters\n", argarray[0], argarray.size());
+				iprintf("Running %s with %d parameters\n", argarray[0], argarray.size());
 				int err = runNdsFile (argarray[0], argarray.size(), (const char **)&argarray[0]);
-				iprintf ("Start failed. Error %i\n", err);
+				iprintf("Start failed. Error %i\n", err);
 			}
 
-			if ((strcasecmp (filename.c_str() + filename.size() - 5, ".firm") == 0)
+			if((strcasecmp (filename.c_str() + filename.size() - 5, ".firm") == 0)
 			|| (strcasecmp (filename.c_str() + filename.size() - 5, ".FIRM") == 0)) {
 				char *name = argarray.at(0);
 				strcpy (filePath + pathLen, name);
 				free(argarray.at(0));
 				argarray.at(0) = filePath;
 				fcopy(argarray[0], "sd:/bootonce.firm");
-				fifoSendValue32(FIFO_USER_02, 1);	// Reboot into selected .firm payload
+				fifoSendValue32(FIFO_USER_02, 1); // Reboot into selected .firm payload
 				swiWaitForVBlank();
 			}
 
@@ -235,10 +224,9 @@ int main(int argc, char **argv) {
 			while (1) {
 				swiWaitForVBlank();
 				scanKeys();
-				if (!(keysHeld() & KEY_A)) break;
+				if(!(keysHeld() & KEY_A)) break;
 			}
 		}
-
 	}
 
 	return 0;

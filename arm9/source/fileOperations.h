@@ -1,7 +1,7 @@
-#include <nds.h>
-
 #ifndef FILE_COPY
 #define FILE_COPY
+
+#include <nds.h>
 
 extern char clipboard[256];
 extern char clipboardFilename[256];

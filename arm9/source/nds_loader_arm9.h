@@ -22,7 +22,6 @@
 #ifndef NDS_LOADER_ARM9_H
 #define NDS_LOADER_ARM9_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
